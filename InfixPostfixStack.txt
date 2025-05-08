@@ -1,0 +1,200 @@
+package infixandPostfix;
+
+public class InfixandPostfix {
+
+	private int top;
+	private int size;
+	private char[] stk;
+
+	// constructor
+	public InfixandPostfix() {
+		this.top = -1;
+		this.size = 0;
+		this.stk = new char[size];
+	}
+
+	public InfixandPostfix(int size)
+	{
+		this.size = size;
+		stk  = new char[this.size];
+		this.top = -1;
+	}
+	// is full method to check stack is full or not
+	public boolean isFull() {
+		if (top == size - 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// is empty method to check stack is empty or not
+	public boolean isEmpty() {
+		if (top == -1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// push method to store value in stack
+	public void push(char value) {
+		if (!isFull()) {
+			stk[++top] = value;
+		} else {
+			System.out.println("Stack is Overflow......");
+		}
+	}
+
+	// pop method to remove value in stack
+	public char pop() {
+		char value=' ';
+		if (!isEmpty()) {
+			value=stk[top--];
+		} else {
+			System.out.println("Stack is Underflow........");
+		}
+		return value;
+	}
+
+	// peek method to display top most element
+	public char peek() {
+		char value = ' ';
+		if (!isEmpty()) {
+			value = stk[top];
+		}
+		return value;
+	}
+
+	// check alphabet
+	public boolean isOperants(char ch) {
+		if (ch >= 'A' && ch <= 'Z')
+			return true;
+		if(ch >= 'a' && ch <= 'z') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// check operator
+	public boolean isOperator(char ch) {
+		if (ch == '$' || ch == '%' || ch == '^' || ch == '*' || ch == '/' || ch == '+' || ch == '-' || ch == '('
+				|| ch == ')') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// priority switch case
+	public int priority(char ch) {
+		switch (ch) {
+		case '$':
+			return 4;
+		case '*':
+		case '/':
+		case '%':
+			return 3;
+		case '+':
+		case '-':
+			return 2;
+		case '^':
+			return 1;
+		}
+		return -1;
+	}
+
+	// infix postfix rules
+	public String Infix_Postfix(String infix) {
+		String postfix ="";
+		int i;
+		char ch,ch2;
+		// take values
+		for (i = 0; i < infix.length(); i++) {
+			// take string one by one
+			ch = infix.charAt(i);
+			// is operant add to postfix
+			if (isOperants(ch)) {
+				postfix += ch;
+			}
+			// is operator add to stack
+			else if (isOperator(ch)) {
+				// rule 1
+				if (ch == '(') {
+					push(ch);
+				}
+				// rule 2
+				else if (ch == ')') {
+					do {
+						ch2 = pop();
+						postfix += ch2;
+					} while (peek() != '(');
+					pop();
+				}
+				// rule 3
+				else if (isEmpty()) {
+					push(ch);
+				}
+				// rule 4
+				else if (peek() == '(') {
+					push(ch);
+				}
+				// rule 5
+				else if (priority(ch) > priority(peek())) {
+					push(ch);
+				} else if (priority(ch) <= priority(peek())) {
+					do {
+						ch2 = pop();
+						postfix += ch2;
+					} while (priority(ch) <= priority(peek()));
+					push(ch);
+				} 
+			}else {
+					System.out.println("Wrong operator...!!!");
+					break;
+				}
+			
+		}
+		
+		while(!isEmpty()) {
+			ch = pop();
+			if(ch=='(' || ch==')') {
+				System.out.println("Wrong infix expression....");
+				postfix ="";
+				break;
+			}
+			postfix += ch;
+		}
+		return postfix;
+	}
+}
+package infixandPostfix;
+
+import java.util.Scanner;
+
+public class ClientInfixandPostfix {
+
+	public static void main(String[] args) {
+		String infix, postfix;
+		Scanner sc = new Scanner(System.in);
+
+		do {
+			System.out.println("Enter Infix Expression: ");
+			infix = sc.next();
+
+			InfixandPostfix s = new InfixandPostfix(infix.length());
+			postfix = s.Infix_Postfix(infix);
+			if (postfix != null) {
+				System.out.println("\n Postfix:: " + postfix);
+			} else {
+				System.out.println("Null");
+			}
+
+			System.out.println("\n new expression?(yes/no)");
+			infix = sc.next();
+		} while (!infix.equals("no"));
+
+	}
+
+}
